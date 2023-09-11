@@ -5,18 +5,28 @@ async function crawledProduct(url) {
     const page = await browser.newPage();
     await page.goto(url);
 
-    const [el] = await page.$x('/html/body/div[3]/div/div[2]/div/div[1]/div[1]/div/div/div[2]/p[1]')
-    const txt = await el.getProperty('textContent')
-    const rawTxt = await txt.jsonValue();
+    const [nameEl] = await page.$x('//*[@id="main-title"]')
+    const name = (await nameEl.getProperty('textContent')).jsonValue();
+    
+    const [designationEl] = await page.$x('//*[@id="profile"]/div/div[2]/h3[1]');
+    const designation = (await designationEl.getProperty("textContent")).jsonValue();
 
-    const [el1] = await page.$x('/html/body/div[3]/div/div[2]/div/div[1]/div[1]/div/div/div[2]/p[2]');
-    const priceText = (await el1.getProperty("textContent")).jsonValue();
-
-    const [el2] = await page.$x('/html/body/div[3]/div/div[2]/div/div[1]/div[1]/div/div/div[2]/p[4]/a');
-    const mailId = (await el2.getProperty("textContent")).jsonValue();
+    const [emailEl] = await page.$x('//*[@id="profile"]/div/div[2]/p/text()[1]');
+    const email = (await emailEl.getProperty("textContent")).jsonValue();
 
 
-    console.log({rawTxt, priceText, mailId});
+    console.log({name, designation, email});
+
+    await browser.close();
 }
 
-crawledProduct('https://wsdc.nitw.ac.in/facultynew/dept/faculty_profiles/cse')
+const facultyUrls = [
+    'https://wsdc.nitw.ac.in/facultynew/facultyprofile/id/16345',
+    'https://wsdc.nitw.ac.in/facultynew/facultyprofile/id/16333',
+    'https://wsdc.nitw.ac.in/facultynew/facultyprofile/id/16347',
+    'https://wsdc.nitw.ac.in/facultynew/facultyprofile/id/16341',
+]
+
+for(const url of facultyUrls) {
+    crawledProduct(url)
+}
