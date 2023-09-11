@@ -9,7 +9,14 @@ async function crawledProduct(url) {
     const txt = await el.getProperty('textContent')
     const rawTxt = await txt.jsonValue();
 
-    console.log({rawTxt});
+    const [el1] = await page.$x('/html/body/div[3]/div/div[2]/div/div[1]/div[1]/div/div/div[2]/p[2]');
+    const priceText = (await el1.getProperty("textContent")).jsonValue();
+
+    const [el2] = await page.$x('/html/body/div[3]/div/div[2]/div/div[1]/div[1]/div/div/div[2]/p[4]/a');
+    const mailId = (await el2.getProperty("textContent")).jsonValue();
+
+
+    console.log({rawTxt, priceText, mailId});
 }
 
 crawledProduct('https://wsdc.nitw.ac.in/facultynew/dept/faculty_profiles/cse')
