@@ -11,11 +11,14 @@ async function crawledProduct(url) {
     const [designationEl] = await page.$x('//*[@id="profile"]/div/div[2]/h3[1]');
     const designation = (await designationEl.getProperty("textContent")).jsonValue();
 
-    const [emailEl] = await page.$x('//*[@id="profile"]/div/div[2]/p/text()[1]');
+    const [deptEl] = await page.$x('//*[@id="profile"]/div/div[2]/h3[2]');
+    const department = (await deptEl.getProperty("textContent")).jsonValue();
+
+    const [emailEl] = await page.$x('//*[@id="profile"]/div/div[2]/p');
     const email = (await emailEl.getProperty("textContent")).jsonValue();
 
 
-    console.log({name, designation, email});
+    console.log({name, department, designation, email});
 
     await browser.close();
 }
