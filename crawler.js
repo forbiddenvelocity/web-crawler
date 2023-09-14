@@ -162,26 +162,24 @@ async function getFacultyUrls(url) {
     const page = await browser.newPage();
     await page.goto(url);
 
-    // Use page.evaluate to extract faculty URLs based on their href attribute
     const facultyUrls = await page.evaluate(() => {
-        const facultyLinks = document.querySelectorAll('a'); // Select all <a> elements on the page
+        const facultyLinks = document.querySelectorAll('a'); 
         const urls = [];
         for (const link of facultyLinks) {
             const href = link.getAttribute('href');
             if (href && href.startsWith('/facultynew/facultyprofile/id/')) {
-                // Filter links with href attribute starting with "/faculty/"
                 urls.push(href);
             }
         }
         return urls;
     });
 
-    await page.close(); // Close the page, but keep the browser instance open
+    await page.close(); 
     return facultyUrls;
 }
 
 async function crawledProduct(url, browser) {
-    const page = await browser.newPage(); // Reuse the same browser instance
+    const page = await browser.newPage(); // Reusing the same browser instance
     await page.goto(url);
 
     const [nameEl] = await page.$x('//*[@id="main-title"]')
@@ -198,7 +196,7 @@ async function crawledProduct(url, browser) {
 
     console.log({name, department, designation, email});
 
-    await page.close(); // Close the page after scraping
+    await page.close(); // Closing
 }
 
 async function main() {
@@ -213,12 +211,12 @@ async function main() {
             console.log(`${index + 1}: ${url}`);
         });
 
-        // Now, iterate through facultyUrls and call crawledProduct for each URL
+        // iterating through facultyUrls and call crawledProduct for each URL
         for (const url of facultyUrls) {
-            await crawledProduct(`https://wsdc.nitw.ac.in${url}`, browser); // Pass the browser instance
+            await crawledProduct(`https://wsdc.nitw.ac.in${url}`, browser); // Passing the browser instance
         }
 
-        // Close the browser instance when done
+        
         await browser.close();
     } else {
         console.log("No faculty URLs found on the page.");
