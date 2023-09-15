@@ -200,7 +200,7 @@ async function crawledProduct(url, browser) {
 }
 
 async function main() {
-    const facultyListPageUrl = 'https://wsdc.nitw.ac.in/facultynew/dept/faculty_profiles/me';
+    const facultyListPageUrl = 'https://wsdc.nitw.ac.in/facultynew/dept/faculty_profiles/ce';
 
     const browser = await puppeteer.launch();
     const facultyUrls = await getFacultyUrls(facultyListPageUrl);
