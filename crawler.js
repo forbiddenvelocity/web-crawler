@@ -156,6 +156,7 @@ async function main() {
 main();
 */
 const puppeteer = require('puppeteer');
+const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 
 async function getFacultyUrls(url) {
     const browser = await puppeteer.launch();
@@ -178,23 +179,30 @@ async function getFacultyUrls(url) {
     return facultyUrls;
 }
 
-async function crawledProduct(url, browser) {
+async function crawledProduct(url, browser, csvWriter, data) {
     const page = await browser.newPage(); // Reusing the same browser instance
     await page.goto(url);
 
     const [nameEl] = await page.$x('//*[@id="main-title"]')
-    const name = (await nameEl.getProperty('textContent')).jsonValue();
+    const name = await (await nameEl.getProperty('textContent')).jsonValue();
     
     const [designationEl] = await page.$x('//*[@id="profile"]/div/div[2]/h3[1]');
-    const designation = (await designationEl.getProperty("textContent")).jsonValue();
+    const designation = await (await designationEl.getProperty("textContent")).jsonValue();
 
     const [deptEl] = await page.$x('//*[@id="profile"]/div/div[2]/h3[2]');
-    const department = (await deptEl.getProperty("textContent")).jsonValue();
+    const department = await (await deptEl.getProperty("textContent")).jsonValue();
 
     const [emailEl] = await page.$x('//*[@id="profile"]/div/div[2]/p');
-    const email = (await emailEl.getProperty("textContent")).jsonValue();
+    const email = await (await emailEl.getProperty("textContent")).jsonValue();
+
+    data.name = name;
+    data.department = department;
+    data.designation = designation;
+    data.email = email;
 
     console.log({name, department, designation, email});
+
+    await csvWriter.writeRecords([data]);
 
     await page.close(); // Closing
 }
@@ -206,7 +214,7 @@ async function main() {
     const facultyUrls = await getFacultyUrls(facultyListPageUrl);
     
     if (facultyUrls.length > 0) {
-        console.log('Faculty URLs:');
+        /*console.log('Faculty URLs:');
         facultyUrls.forEach((url, index) => {
             console.log(`${index + 1}: ${url}`);
         });
@@ -215,7 +223,23 @@ async function main() {
         for (const url of facultyUrls) {
             await crawledProduct(`https://wsdc.nitw.ac.in${url}`, browser); // Passing the browser instance
         }
+        */
+        const csvWriter = createCsvWriter({
+            path: 'faculty_data.csv',
+            header: [
+                { id: 'name', title: 'Name' },
+                { id: 'department', title: 'Department' },
+                { id: 'designation', title: 'Designation' },
+                { id: 'email', title: 'Email' },
+            ],
+            append: true, // Append to an existing file if it exists
+        });
 
+        console.log('Faculty URLs:');
+        for (const url of facultyUrls) {
+            const data = {};
+            await crawledProduct(`https://wsdc.nitw.ac.in${url}`, browser, csvWriter, data);
+        }
         
         await browser.close();
     } else {
